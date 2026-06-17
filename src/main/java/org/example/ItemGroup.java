@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import jakarta.persistence.*;
-
+import java.util.UUID;
 import org.example.Item;
 
 @Entity
@@ -13,6 +13,9 @@ public class ItemGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false, updatable = false)
+    private String publicId = UUID.randomUUID().toString();
 
     private String name;
     private String color;
@@ -23,8 +26,7 @@ public class ItemGroup {
 
     }
 
-    public ItemGroup(Long id, String name, String color, String typeOfGroup) {
-        this.id = id;
+    public ItemGroup(String name, String color, String typeOfGroup) {
         this.name = name;
         this.color = color;
         this.typeOfGroup = typeOfGroup;
@@ -42,7 +44,7 @@ public class ItemGroup {
         itemList.remove(item);
     }
 
-    public void setNamee(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -65,4 +67,9 @@ public class ItemGroup {
     public String getTypeOfGroup() {
         return typeOfGroup;
     }
+
+    public String getId() {
+        return publicId;
+    }
+
 }

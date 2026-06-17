@@ -1,0 +1,51 @@
+
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: my_database
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: my_password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U my_user -d my_database" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+  envoy-proxy:
+    image: envoyproxy/envoy:v1.30-latest
+    container_name: envoy-proxy
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    volumes:
+      - ./src/main/resources/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./target/proto-descriptor/proto.pb:/data/proto.pb
+    depends_on:
+      - postgres-db
+      - redis-cache
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  read-service:
+    build: .
+    container_name: read-service
+    ports:
+      - "9090:9090"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/my_database
+      - SPRING_DATASOURCE_USERNAME=my_user
+      - SPRING_DATASOURCE_PASSWORD=my_password
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - GRPC_PORT=9090
+    depends_on:
+      postgres-db:
+        condition:
+          service_healthy

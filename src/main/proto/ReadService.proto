@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package com.example.readservice;
+
+option java_multiple_files = true;
+option java_package = "org.example.grpc.readservice";
+option java_outer_classname = "ReadProto";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+message EmptyRequest {
+
+}
+
+message UserRequest {
+  string name = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message UserResponse {
+  string name = 1;
+  string color = 2;
+  string typeOfGroup = 3;
+}
+
+message UserResponseList {
+  repeated UserResponse items = 1;
+}
+
+service ReadService {
+  rpc GetItemGroup (UserRequest) returns (UserResponseList) {
+    option (google.api.http) = {
+      get: "/read/{name}"
+    };
+  }
+  rpc GetAllItemGroups (EmptyRequest) returns (UserResponseList) {
+    option (google.api.http) = {
+      get: "/read"
+    };
+  }
+}

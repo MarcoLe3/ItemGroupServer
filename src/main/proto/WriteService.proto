@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package com.example.writeservice;
+
+option java_multiple_files = true;
+option java_package = "org.example.grpc.writeservice";
+option java_outer_classname = "WriteProto";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/field_mask.proto";
+
+message CreateUserRequest {
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  string color = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  string type_of_group = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+message UpdateUserRequest {
+  string public_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string name = 2;
+  string color = 3;
+  string type_of_group = 4;
+  google.protobuf.FieldMask update_mask = 5;
+  bool allow_missing = 6;
+}
+
+message DeleteUserRequest {
+  string public_id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message UserResponse {
+  int32 status = 1;
+}
+
+service WriteService {
+  rpc writeNewItemGroup (CreateUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      post: "/write"
+      body: "*"
+    };
+  }
+
+  rpc updateItemGroup (UpdateUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      patch: "/write/{name}"
+      body: "*"
+    };
+  }
+
+  rpc deleteItemGroup (DeleteUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      delete: "/write/delete/{public_id}"
+      body: "*"
+    };
+  }
+}
