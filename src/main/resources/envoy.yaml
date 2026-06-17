@@ -64,8 +64,8 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: read-service # Matches your docker-compose service name
-                      port_value: 9090      # Matches your gRPC Spring Boot port
+                      address: read-service
+                      port_value: 9090
       typed_extension_protocol_options:
         envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
           "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
